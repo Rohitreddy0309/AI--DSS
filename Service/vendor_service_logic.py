@@ -1,15 +1,33 @@
 from sqlalchemy.orm import Session
 from models.vendors import Vendors
+<<<<<<< HEAD
 from repositories.vendor_repository import add_new_vendor
 import base64
 import os
 import requests
 from dotenv import load_dotenv
 from utils.pdf_generator import create_pdf
+=======
+from repositories import vendor_repository
+import base64
+from repositories.vendor_repository import add_new_vendor
+import os
+from dotenv import load_dotenv
+import requests
+
+import mimetypes
+import shutil
+from fastapi import UploadFile
+
+>>>>>>> origin/dev
 
 load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/dev
 API_URL = os.getenv("API_URL")
 
 headers = {
@@ -19,6 +37,7 @@ headers = {
 
 UPLOAD_FOLDER = "uploads"
 
+<<<<<<< HEAD
 
 def list_all_vendor(db):
     from repositories import vendor_repository
@@ -38,6 +57,51 @@ async def upload_vendor_file(vendor_name, file, db):
 
     image_base64 = base64.b64encode(file_bytes).decode("utf-8")
 
+=======
+async def save_pdf(file: UploadFile):
+
+    # create uploads folder if not exists
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+    file_path = os.path.join(UPLOAD_FOLDER, file.File_name)
+
+    # save file
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    return {
+        "file_name": file.File_name,
+        "file_path": file_path
+    }
+
+
+def list_all_vendor(db):
+    vendors= vendor_repository.get_all_vendors(db)
+    return vendors
+
+
+async def upload_vendor_file(vendor_name, file, db):
+    """Handle complete upload logic."""
+
+    # create uploads folder if it doesn't exist
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+    # create file path
+    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+
+    # read uploaded file
+    file_bytes = await file.read()
+
+    # save file locally
+    with open(file_path, "wb") as f:
+        f.write(file_bytes)
+
+    # convert file to base64 for model input
+    image_base64 = base64.b64encode(file_bytes).decode("utf-8")
+
+    mime_type, _ = mimetypes.guess_type(file_path)
+
+>>>>>>> origin/dev
     payload = {
         "model": "meta-llama/llama-4-scout-17b-16e-instruct",
         "messages": [
@@ -46,6 +110,7 @@ async def upload_vendor_file(vendor_name, file, db):
                 "content": [
                     {
                         "type": "text",
+<<<<<<< HEAD
                         "text": """
     You are a professional architectural design reviewer.
 
@@ -71,11 +136,18 @@ async def upload_vendor_file(vendor_name, file, db):
     - Keep sentences clear and professional
     - Avoid very long paragraphs
     """
+=======
+                        "text": "Analyze this building architecture drawing and list pros and cons."
+>>>>>>> origin/dev
                     },
                     {
                         "type": "image_url",
                         "image_url": {
+<<<<<<< HEAD
                             "url": f"data:image/png;base64,{image_base64}"
+=======
+                            "url": f"data:{mime_type};base64,{image_base64}"
+>>>>>>> origin/dev
                         }
                     }
                 ]
@@ -83,6 +155,11 @@ async def upload_vendor_file(vendor_name, file, db):
         ]
     }
 
+<<<<<<< HEAD
+=======
+ 
+
+>>>>>>> origin/dev
     try:
         response = requests.post(
             API_URL,
@@ -100,6 +177,7 @@ async def upload_vendor_file(vendor_name, file, db):
     except Exception as e:
         comments = str(e)
 
+<<<<<<< HEAD
     # create pdf with comments
     pdf_data = {
         "vendor_name": vendor_name,
@@ -114,6 +192,12 @@ async def upload_vendor_file(vendor_name, file, db):
         vendor_name=vendor_name,
         File_name=file.filename,
         comments=pdf_name
+=======
+    vendor = Vendors(
+        vendor_name=vendor_name,
+        File_name=file.filename,
+        comments=comments
+>>>>>>> origin/dev
     )
 
     saved_vendor = add_new_vendor(db, vendor)
@@ -122,5 +206,9 @@ async def upload_vendor_file(vendor_name, file, db):
         "file_id": saved_vendor.file_id,
         "vendor_name": saved_vendor.vendor_name,
         "File_name": saved_vendor.File_name,
+<<<<<<< HEAD
         "pdf_file": pdf_name
+=======
+        "comments": saved_vendor.comments
+>>>>>>> origin/dev
     }
