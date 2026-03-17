@@ -18,10 +18,7 @@ async def upload_file(
     db: Session = Depends(get_db)
 ):
     """Upload endpoint."""
-<<<<<<< HEAD
-=======
-    mime_type = File_name.content_type   # ✅ detects jpg/png/webp automatically
->>>>>>> origin/dev
+    mime_type = File_name.content_type   # detects jpg/png/webp automatically
 
     result = await vendor_service_logic.upload_vendor_file(
         vendor_name,
@@ -37,7 +34,4 @@ async def upload_file(
 @router.get("/get all vendors/")
 def get_all_analysis( db: Session = Depends(get_db)):
     return vendor_service_logic.list_all_vendor(db)
-<<<<<<< HEAD
-=======
     
->>>>>>> origin/dev

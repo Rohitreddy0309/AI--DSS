@@ -1,33 +1,20 @@
 from sqlalchemy.orm import Session
 from models.vendors import Vendors
-<<<<<<< HEAD
 from repositories.vendor_repository import add_new_vendor
+from repositories import vendor_repository
+
 import base64
 import os
 import requests
 from dotenv import load_dotenv
 from utils.pdf_generator import create_pdf
-=======
-from repositories import vendor_repository
-import base64
-from repositories.vendor_repository import add_new_vendor
-import os
-from dotenv import load_dotenv
-import requests
-
 import mimetypes
 import shutil
 from fastapi import UploadFile
 
->>>>>>> origin/dev
-
 load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/dev
 API_URL = os.getenv("API_URL")
 
 headers = {
@@ -37,71 +24,43 @@ headers = {
 
 UPLOAD_FOLDER = "uploads"
 
-<<<<<<< HEAD
 
 def list_all_vendor(db):
-    from repositories import vendor_repository
     return vendor_repository.get_all_vendors(db)
 
 
-async def upload_vendor_file(vendor_name, file, db):
-
+async def save_pdf(file: UploadFile):
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
 
-    file_bytes = await file.read()
-
-    with open(file_path, "wb") as f:
-        f.write(file_bytes)
-
-    image_base64 = base64.b64encode(file_bytes).decode("utf-8")
-
-=======
-async def save_pdf(file: UploadFile):
-
-    # create uploads folder if not exists
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-    file_path = os.path.join(UPLOAD_FOLDER, file.File_name)
-
-    # save file
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     return {
-        "file_name": file.File_name,
+        "file_name": file.filename,
         "file_path": file_path
     }
 
 
-def list_all_vendor(db):
-    vendors= vendor_repository.get_all_vendors(db)
-    return vendors
-
-
-async def upload_vendor_file(vendor_name, file, db):
+async def upload_vendor_file(vendor_name, file: UploadFile, db):
     """Handle complete upload logic."""
 
-    # create uploads folder if it doesn't exist
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-    # create file path
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
 
-    # read uploaded file
     file_bytes = await file.read()
 
-    # save file locally
+    # save file
     with open(file_path, "wb") as f:
         f.write(file_bytes)
 
-    # convert file to base64 for model input
+    # base64 conversion
     image_base64 = base64.b64encode(file_bytes).decode("utf-8")
 
     mime_type, _ = mimetypes.guess_type(file_path)
 
->>>>>>> origin/dev
     payload = {
         "model": "meta-llama/llama-4-scout-17b-16e-instruct",
         "messages": [
@@ -110,44 +69,35 @@ async def upload_vendor_file(vendor_name, file, db):
                 "content": [
                     {
                         "type": "text",
-<<<<<<< HEAD
                         "text": """
-    You are a professional architectural design reviewer.
+You are a professional architectural design reviewer.
 
-    Analyze the building architecture drawing and generate a professional design review.
+Analyze the building architecture drawing and generate a professional design review.
 
-    Return the result in this format:
+Return the result in this format:
 
-    Overview:
-    Write 2-3 sentences describing the layout and purpose of the drawing.
+Overview:
+Write 2-3 sentences describing the layout and purpose of the drawing.
 
-    Pros:
-    - Write 4 clear advantages of the design.
+Pros:
+- Write 4 clear advantages of the design.
 
-    Cons:
-    - Write 4 possible issues or design limitations.
+Cons:
+- Write 4 possible issues or design limitations.
 
-    Recommendations:
-    - Write 3 practical improvement suggestions.
+Recommendations:
+- Write 3 practical improvement suggestions.
 
-    Rules:
-    - Use bullet points starting with "-"
-    - Do not use numbering like 1,2,3
-    - Keep sentences clear and professional
-    - Avoid very long paragraphs
-    """
-=======
-                        "text": "Analyze this building architecture drawing and list pros and cons."
->>>>>>> origin/dev
+Rules:
+- Use bullet points starting with "-"
+- Do not use numbering
+- Keep sentences clear and professional
+"""
                     },
                     {
                         "type": "image_url",
                         "image_url": {
-<<<<<<< HEAD
-                            "url": f"data:image/png;base64,{image_base64}"
-=======
                             "url": f"data:{mime_type};base64,{image_base64}"
->>>>>>> origin/dev
                         }
                     }
                 ]
@@ -155,11 +105,7 @@ async def upload_vendor_file(vendor_name, file, db):
         ]
     }
 
-<<<<<<< HEAD
-=======
- 
-
->>>>>>> origin/dev
+   
     try:
         response = requests.post(
             API_URL,
@@ -177,8 +123,7 @@ async def upload_vendor_file(vendor_name, file, db):
     except Exception as e:
         comments = str(e)
 
-<<<<<<< HEAD
-    # create pdf with comments
+
     pdf_data = {
         "vendor_name": vendor_name,
         "File_name": file.filename,
@@ -187,17 +132,10 @@ async def upload_vendor_file(vendor_name, file, db):
 
     pdf_name = create_pdf(pdf_data)
 
-    # save only PDF name in DB
     vendor = Vendors(
         vendor_name=vendor_name,
         File_name=file.filename,
-        comments=pdf_name
-=======
-    vendor = Vendors(
-        vendor_name=vendor_name,
-        File_name=file.filename,
-        comments=comments
->>>>>>> origin/dev
+        comments=pdf_name   # store PDF name
     )
 
     saved_vendor = add_new_vendor(db, vendor)
@@ -206,9 +144,5 @@ async def upload_vendor_file(vendor_name, file, db):
         "file_id": saved_vendor.file_id,
         "vendor_name": saved_vendor.vendor_name,
         "File_name": saved_vendor.File_name,
-<<<<<<< HEAD
         "pdf_file": pdf_name
-=======
-        "comments": saved_vendor.comments
->>>>>>> origin/dev
     }
