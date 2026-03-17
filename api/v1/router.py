@@ -33,4 +33,3 @@ async def upload_file(
 @router.get("/get all vendors/")
 def get_all_analysis( db: Session = Depends(get_db)):
     return vendor_service_logic.list_all_vendor(db)
-    
