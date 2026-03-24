@@ -35,7 +35,7 @@ class CommentStatus(enum.Enum):
 class Comments(Base):
     __tablename__ = "comments"
     id = Column(UUID(as_uuid=True),primary_key=True,default=uuid.uuid4,nullable=False)
-    deliverable_id = Column(UUID(as_uuid=True),ForeignKey("documents.id"),nullable=False,index=True)
+    deliverable_id = Column(UUID(as_uuid=True),ForeignKey("deliverables.id"),nullable=False,index=True)
     comment_number = Column(SmallInteger,nullable=False)
     source = Column(Enum(CommentSource, name="comment_source_enum"),nullable=False,index=True)
     location_reference = Column(String(300),nullable=False)
@@ -56,9 +56,9 @@ class Comments(Base):
     carried_forward_from_id = Column( UUID(as_uuid=True), ForeignKey("comments.id"), nullable=True)
     created_at = Column( DateTime(timezone=True),nullable=False,server_default=func.now())
        # RELATIONSHIPS
-    document = relationship("Document")
-    reviewer = relationship("User",foreign_keys=[reviewed_by])
-    historical_comment = relationship("Comment",remote_side=[id],foreign_keys=[historical_comment_id])
-    carried_forward = relationship( "Comment",remote_side=[id],foreign_keys=[carried_forward_from_id])
+    deliverable = relationship("Deliverables", back_populates="comments")
+    reviewer = relationship("Users",foreign_keys=[reviewed_by],backref="reviewed_comments")
+    historical_comment = relationship("Comments",remote_side=[id],foreign_keys=[historical_comment_id])
+    carried_forward = relationship( "Comments",remote_side=[id],foreign_keys=[carried_forward_from_id])
 
 

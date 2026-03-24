@@ -46,7 +46,8 @@ class FinalVerdict(enum.Enum):
     REJECTED = "REJECTED"
 
 class Deliverables(Base):
-    __tablename__ = "documents"
+    __tablename__ = "deliverables"
+
     id = Column(UUID(as_uuid=True),primary_key=True,default=uuid.uuid4,nullable=False)
     document_number = Column(String(150),nullable=False,index=True)
     revision = Column( String(20), nullable=False)
@@ -56,7 +57,7 @@ class Deliverables(Base):
     transmittal_id = Column( UUID(as_uuid=True), ForeignKey("transmittals.id"), nullable=False, index=True)
     project_id = Column( UUID(as_uuid=True),ForeignKey("projects.id"),nullable=False,index=True)
     assigned_engineer_id = Column(UUID(as_uuid=True),ForeignKey("users.id"),nullable=True,index=True)
-    previous_revision_id = Column( UUID(as_uuid=True), ForeignKey("documents.id"),nullable=True)
+    previous_revision_id = Column( UUID(as_uuid=True), ForeignKey("deliverables.id"),nullable=True)
     file_name = Column(String(300), nullable=False)
     blob_url = Column(Text,nullable=False)
     file_size_bytes = Column( BigInteger,nullable=False)
@@ -77,8 +78,9 @@ class Deliverables(Base):
     created_at = Column(DateTime(timezone=True),nullable=False,server_default=func.now())
     updated_at = Column( DateTime(timezone=True), nullable=False,server_default=func.now(),onupdate=func.now())
     # RELATIONSHIPS
-    transmittal = relationship("Transmittal")
-    project = relationship("Project")
-    assigned_engineer = relationship("User",foreign_keys=[assigned_engineer_id])
-    previous_revision = relationship("Document",remote_side=[id])
+    transmittal = relationship("Transmittals", back_populates="deliverables")
+    comments = relationship("Comments", back_populates="deliverable")
+    project = relationship("Project", back_populates="deliverables")
+    assigned_engineer = relationship("Users",foreign_keys=[assigned_engineer_id])
+    previous_revision = relationship("Deliverables",remote_side=[id])
 

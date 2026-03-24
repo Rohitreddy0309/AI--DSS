@@ -23,9 +23,9 @@ class EngineerOverride(enum.Enum):
 class Checklist(Base):
         __tablename__ = "checklists"
         id = Column(UUID(as_uuid=True),primary_key=True,default=uuid.uuid4,nullable=False)
-        deliverable_id = Column(UUID(as_uuid=True),ForeignKey("documents.id"),nullable=False,index=True)
-        checklist_id = Column(UUID(as_uuid=True),ForeignKey("checklists.id"),nullable=False)
-        checklist_item_id = Column(UUID(as_uuid=True),ForeignKey("checklists.id"),nullable=False)
+        deliverable_id = Column(UUID(as_uuid=True),ForeignKey("deliverables.id"),nullable=False,index=True)
+        checklist_id = Column(UUID(as_uuid=True),ForeignKey("checklists.id"),nullable=True)
+        checklist_item_id = Column(UUID(as_uuid=True),ForeignKey("checklist_items.id"),nullable=False)
         ai_result = Column(Enum(AIResult, name="ai_result_enum"),nullable=False)
         ai_evidence = Column(Text,nullable=True)
         engineer_override = Column(Enum(EngineerOverride, name="engineer_override_enum"),nullable=True)
@@ -34,8 +34,8 @@ class Checklist(Base):
         created_at = Column(DateTime(timezone=True), nullable=False,server_default=func.now())
         
     # RELATIONSHIPS
-        document = relationship("Document")
-        checklist = relationship("Checklist")
-        checklist_item = relationship("ChecklistItem")
-        overridden_user = relationship("User",foreign_keys=[overridden_by])
+        document = relationship("Deliverables")
+        checklist = relationship("Checklist", foreign_keys=[checklist_id], remote_side=[id])
+        checklist_item = relationship("ChecklistItem", foreign_keys=[checklist_item_id], back_populates="checklists")
+        overridden_user = relationship("Users",foreign_keys=[overridden_by])
         

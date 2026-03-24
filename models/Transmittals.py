@@ -44,6 +44,7 @@ class Transmittals(Base):
     created_at = Column( DateTime(timezone=True), nullable=False, server_default=func.now())
     # RELATIONSHIPS
     project = relationship("Project")
-    contractor_company = relationship("ContractorCompany")
-    submitted_user = relationship("User",foreign_keys=[submitted_by])
-    doc_controller = relationship("User",foreign_keys=[doc_ctrl_id])
+    contractor_company = relationship("Companies")
+    deliverables = relationship("Deliverables",back_populates="transmittal")
+    submitted_user = relationship("Users",foreign_keys=[submitted_by])
+    doc_controller = relationship("Users",foreign_keys=[doc_ctrl_id])

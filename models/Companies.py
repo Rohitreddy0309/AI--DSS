@@ -22,7 +22,7 @@ class Companies(Base):
     created_at = Column( DateTime(timezone=True), nullable=False, server_default=func.now())
     # RELATIONSHIPS
     users = relationship(
-        "User",
+        "Users",
         back_populates="contractor_company",
         cascade="all, delete-orphan"
     )

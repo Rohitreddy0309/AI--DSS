@@ -42,5 +42,6 @@ class Project(Base):
     updated_at = Column(DateTime(timezone=True),nullable=False,server_default=func.now(),onupdate=func.now())
     
     # RELATIONSHIPS
-    project_manager = relationship("User",foreign_keys=[project_manager_id])
-    creator = relationship("User",foreign_keys=[created_by])
+    deliverables = relationship("Deliverables",back_populates="project")
+    project_manager = relationship("Users",foreign_keys=[project_manager_id])
+    creator = relationship("Users",foreign_keys=[created_by])

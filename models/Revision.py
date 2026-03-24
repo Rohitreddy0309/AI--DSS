@@ -11,10 +11,10 @@ from sqlalchemy.orm import relationship
 from core.database import Base 
 
 class Revision(Base):
-    __tablename__ = "revision_comparisons "
+    __tablename__ = "revision_comparisons"
     id = Column(UUID(as_uuid=True),primary_key=True,default=uuid.uuid4,nullable=False)
-    current_deliverable_id = Column(UUID(as_uuid=True),ForeignKey("documents.id"),nullable=False,index=True)
-    prior_deliverable_id = Column(UUID(as_uuid=True),ForeignKey("documents.id"),nullable=False)
+    current_deliverable_id = Column(UUID(as_uuid=True),ForeignKey("deliverables.id"),nullable=False,index=True)
+    prior_deliverable_id = Column(UUID(as_uuid=True),ForeignKey("deliverables.id"),nullable=False)
     diff_json_ref = Column(String(300),nullable=False)
     added_fields_count = Column(SmallInteger,nullable=False)
     deleted_fields_count = Column(SmallInteger,nullable=False)
@@ -27,5 +27,5 @@ class Revision(Base):
     created_at = Column(DateTime(timezone=True),nullable=False,server_default=func.now())
     
     # RELATIONSHIPS
-    current_document = relationship("Document",foreign_keys=[current_deliverable_id])
-    prior_document = relationship("Document",foreign_keys=[prior_deliverable_id])
+    current_document = relationship("Deliverables",foreign_keys=[current_deliverable_id])
+    prior_document = relationship("Deliverables",foreign_keys=[prior_deliverable_id])

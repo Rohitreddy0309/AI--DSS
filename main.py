@@ -11,6 +11,7 @@ from models.Transmittals import Transmittals
 from models.deliverables import Deliverables
 from models.Review import Comments
 from models.checklists import Checklist
+from models import checklist_items
 from models.Revision import Revision
 from models.HistoricalComments import HistoricalComments
 from models.Reference import ReferenceDocument

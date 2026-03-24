@@ -43,5 +43,5 @@ class ReferenceDocument(Base):
     created_at = Column(DateTime(timezone=True),nullable=False,server_default=func.now())
       # RELATIONSHIPS
     project = relationship("Project")
-    uploader = relationship("User",foreign_keys=[uploaded_by] )
+    uploader = relationship("Users",foreign_keys=[uploaded_by] )
     superseded_document = relationship( "ReferenceDocument", remote_side=[id])
